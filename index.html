@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡STARTING STREAM!</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Courier New', Courier, monospace; }
+        body { background-color: #008080; color: black; overflow: hidden; height: 100vh; width: 100vw; display: flex; justify-content: center; align-items: center; padding: 15px; position: relative; }
+        
+        /* PANTALLA DE CARGA RETRO */
+        #boot-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0d0d0d; color: #f0f0f0; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; }
+        
+        /* COMPUTADORA PIXELADA */
+        .pixel-pc { width: 100px; height: 90px; display: flex; flex-direction: column; align-items: center; margin-bottom: 25px; }
+        .pc-screen-border { width: 70px; height: 50px; background: #2b2b2b; border: 4px solid #444; border-right-color: #1a1a1a; border-bottom-color: #1a1a1a; padding: 6px; border-radius: 4px; }
+        .pc-screen-inside { width: 100%; height: 100%; background: #111; border: 3px solid #000; border-right-color: #333; border-bottom-color: #333; }
+        .pc-case { width: 84px; height: 26px; background: #444; border: 4px solid #555; border-right-color: #222; border-bottom-color: #222; margin-top: 2px; position: relative; border-radius: 2px; }
+        .pc-slots { width: 30px; height: 4px; background: #111; position: absolute; right: 8px; top: 6px; }
+        .pc-button { width: 5px; height: 5px; background: #ffffff; position: absolute; left: 10px; top: 6px; animation: blink 0.5s infinite; }
+        .pc-bottom { width: 90px; height: 6px; background: #222; margin-top: -1px; }
+
+        .loading-text { font-size: 14px; margin-bottom: 5px; letter-spacing: 1px; font-weight: bold; color: #fff; }
+        #percentage { font-size: 20px; font-weight: bold; margin-bottom: 15px; color: #ffffaa; }
+
+        /* LA BARRA RETRO GRIS/BLANCA */
+        .loading-bar { width: 280px; height: 24px; padding: 2px; display: flex; background: transparent; border: 2px solid #fff;}
+        .block { width: 14px; height: 100%; background: #fff; margin-right: 2px; display: none; }
+        
+        /* ESTILO VENTANAS WINDOWS CLASSIC CELESTIALMENTE CENTRADAS PARA CELULAR */
+        .window { background: #c0c0c0; border: 3px solid; border-color: #fff #808080 #808080 #fff; width: 92%; max-width: 340px; box-shadow: 4px 4px 15px rgba(0,0,0,0.6); display: none; position: absolute; color: black; left: 50%; transform: translateX(-50%); }
+        .title-bar { background: linear-gradient(90deg, #000080, #1084d0); color: white; padding: 4px 8px; font-weight: bold; font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
+        .close-btn { background: #c0c0c0; border: 2px solid; border-color: #fff #808080 #808080 #fff; font-size: 10px; width: 16px; height: 16px; text-align: center; line-height: 12px; color: black; cursor: pointer; }
+        .window-body { padding: 12px; font-size: 14px; text-align: center; }
+        
+        .btn { background: #c0c0c0; border: 2px solid; border-color: #fff #808080 #808080 #fff; padding: 6px 20px; font-size: 13px; margin-top: 15px; cursor: pointer; display: inline-block; font-weight: bold; }
+        .btn:active { border-color: #808080 #fff #fff #808080; }
+
+        /* EFECTO CASCADA VERTICAL (IDEAL PARA PANTALLAS DE CELULAR) */
+        #popup1 { top: 8%; z-index: 10; }
+        #popup2 { top: 16%; z-index: 11; }
+        #popup3 { top: 24%; z-index: 12; }
+        #popup4 { top: 32%; z-index: 13; }
+
+        /* CONTENEDORES DE REGALO REAL */
+        #alert-win { top: 30%; z-index: 50; }
+        #gallery-win { top: 2%; z-index: 40; height: auto; }
+        #text-win { bottom: 2%; z-index: 39; }
+
+        .photo-container { width: 100%; height: 210px; background: #808080; margin-top: 5px; border: 2px inset #fff; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .photo-container img { width: 100%; height: 100%; object-fit: contain; background: #f0f0f0; }
+        .notepad-text { background: white; border: 2px inset #fff; padding: 10px; text-align: left; min-height: 150px; max-height: 205px; font-size: 12px; white-space: pre-wrap; line-height: 1.4; color: black; overflow-y: auto; }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    </style>
+</head>
+<body>
+
+    <!-- CANCIÓN ENLACE DIRECTO DE LA INTRO DE WILL -->
+    <audio id="bg-music" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-84.wav" loop></audio>
+
+    <!-- PANTALLA DE CARGA -->
+    <div id="boot-screen">
+        <div class="pixel-pc">
+            <div class="pc-screen-border"><div class="pc-screen-inside"></div></div>
+            <div class="pc-case"><div class="pc-button"></div><div class="pc-slots"></div></div>
+            <div class="pc-bottom"></div>
+        </div>
+        <div class="loading-text" id="status-text">BOOTING SYSTEM...</div>
+        <div id="percentage">0%</div>
+        <div class="loading-bar" id="bar">
+            <div class="block"></div><div class="block"></div><div class="block"></div><div class="block"></div>
+            <div class="block"></div><div class="block"></div><div class="block"></div><div class="block"></div>
+            <div class="block"></div><div class="block"></div><div class="block"></div><div class="block"></div>
+            <div class="block"></div><div class="block"></div><div class="block"></div><div class="block"></div>
+        </div>
+    </div>
+
+    <!-- POPUPS TRUCHOS MANTENIDOS -->
+    <div class="window" id="popup1"><div class="title-bar"><span>SYSTEM_ERROR.LOG</span><div class="close-btn" onclick="cerrar('popup1')">X</div></div><div class="window-body"><p style="color:red; font-weight:bold;">⚠️ Audio Buffer Overflow</p></div></div>
+    <div class="window" id="popup2"><div class="title-bar"><span>stream_status.exe</span><div class="close-btn" onclick="cerrar('popup2')">X</div></div><div class="window-body"><p>Connecting to Twitch Servers... Fail.</p></div></div>
+    <div class="window" id="popup3"><div class="title-bar"><span>Notice</span><div class="close-btn" onclick="cerrar('popup3')">X</div></div><div class="window-body"><p>Unidentified background track detected.</p></div></div>
+    <div class="window" id="popup4"><div class="title-bar"><span>OBS Studio</span><div class="close-btn" onclick="cerrar('popup4')">X</div></div><div class="window-body"><p>Frame drop detected (89%).</p></div></div>
+
+    <!-- ALERTA REAL PRINCIPAL -->
+    <div class="window" id="alert-win">
+        <div class="title-bar"><span>System Notification</span><div class="close-btn" onclick="avanzarRegalo()">X</div></div>
+        <div class="window-body">
+            <p style="font-weight: bold; color: #000080; margin-bottom: 8px;">🎉 STREAM INITIALIZED</p>
+            <p>Se ha detectado que mi <strong>osito Polar &lt;3</strong> está poniéndose viejito.</p>
+            <div class="btn" onclick="avanzarRegalo()">Aceptar</div>
+        </div>
+    </div>
+
+    <!-- VENTANA BUBU CON ENLACE DIRECTO FUNCIONAL -->
+    <div class="window" id="gallery-win">
+        <div class="title-bar"><span>bubu.exe</span><div class="close-btn" onclick="cerrar('gallery-win')">X</div></div>
+        <div class="window-body">
+            <div class="photo-container">
+                <img src="https://i.postimg.cc/D0dZjpbY/2-sin-titulo.png" id="wilbur-birthday" alt="Bubu">
+            </div>
+        </div>
+    </div>
+
+    <!-- BLOC DE NOTAS CON TU CARTA -->
+    <div class="window" id="text-win">
+        <div class="title-bar"><span>Nota_de_Cumpleaños.txt</span><div class="close-btn" onclick="cerrar('text-win')">X</div></div>
+        <div class="window-body">
+            <div class="notepad-text" id="typewriter"></div>
+        </div>
+    </div>
+
+    <script>
+        function cerrar(id) { document.getElementById(id).style.display = 'none'; }
+
+        const bloques = document.querySelectorAll('.block');
+        const percentEl = document.getElementById('percentage');
+        const statusTxt = document.getElementById('status-text');
+        let currentPercent = 0;
+
+        const frasesCarga = [
+            "BOOTING SYSTEM...",
+            "LOADING STREAM LAYOUTS...",
+            "SYNCHRONIZING AUDIO CHANNELS...",
+            "ESTABLISHING CHAT CONNECTION..."
+        ];
+
+        // Carga controlada y pausada
+        const percentInterval = setInterval(() => {
+            if (currentPercent < 100) {
+                currentPercent += Math.floor(Math.random() * 3) + 2; 
+                if (currentPercent > 99) currentPercent = 99;
+                percentEl.innerText = currentPercent + '%';
+                
+                if(currentPercent > 25 && currentPercent < 50) statusTxt.innerText = frasesCarga[1];
+                if(currentPercent > 50 && currentPercent < 75) statusTxt.innerText = frasesCarga[2];
+                if(currentPercent > 75) statusTxt.innerText = frasesCarga[3];
+
+                let blockToShow = Math.floor((currentPercent / 100) * bloques.length);
+                for(let b = 0; b <= blockToShow; b++) {
+                    if(bloques[b]) bloques[b].style.display = 'block';
+                }
+            }
+        }, 300);
+
+        // Fin de la pantalla de carga
+        setTimeout(() => {
+            clearInterval(percentInterval);
+            percentEl.innerText = 'READY.';
+            statusTxt.innerText = 'SYSTEM ONLINE';
+            
+            setTimeout(() => {
+                document.getElementById('boot-screen').style.display = 'none';
+                
+                // Popups en cascada
+                setTimeout(() => { document.getElementById('popup1').style.display = 'block'; }, 200);
+                setTimeout(() => { document.getElementById('popup2').style.display = 'block'; }, 600);
+                setTimeout(() => { document.getElementById('popup3').style.display = 'block'; }, 1000);
+                setTimeout(() => { document.getElementById('popup4').style.display = 'block'; }, 1400);
+                
+                // Disparar cartelera principal
+                setTimeout(() => { document.getElementById('alert-win').style.display = 'block'; }, 2800);
+            }, 1000);
+        }, 10000);
+
+        // Acción al presionar el botón "Aceptar"
+        function avanzarRegalo() {
+            // Reproducir música tras la interacción obligatoria del usuario
+            const audio = document.getElementById('bg-music');
+            audio.play().catch(error => console.log("Permiso de audio concedido", error));
+
+            cerrar('alert-win');
+            cerrar('popup1');
+            cerrar('popup2');
+            cerrar('popup3');
+            cerrar('popup4');
+            
+            document.getElementById('gallery-win').style.display = 'block';
+            document.getElementById('text-win').style.display = 'block';
+            iniciarMaquinaEscribir();
+        }
+
+        function iniciarMaquinaEscribir() {
+            const texto = "Feliz cumpleaños, Osito :D\n\nNo sabía muy bien cómo empezar esto porque siento que decir solo “feliz cumple” se queda demasiado corto y não não mi friend 🗣️ Quería aprovechar este día para recordarte lo mucho que te aprecio y lo importante que eres para mí <3\n\nGracias por todos los momentos que hemos compartido, por las conversaciones eternas, por las risas y por esas pequeñas cosas que quizás parecen normales pero que para mí significan una banda la vdd. Me alegra mucho haberte conocido en ese Team y poder seguir teniendo un lugar en tu vida.\n\nTambién quería decirte que aunque a veces no sea la persona más buena expresando lo que siento, te tengo muchísimo cariño y espero que nunca olvides lo especial que eres para mí.\n\nFeliz cumpleaños, Alex. Gracias por existir y por aguantar mis babosadas KSKS Espero que tengas un día increíble 💗\n\npdt- Siempre serás mi drogadic- Hermes, Favorito<3\n\nTu Florecita y Ciego ⁠๑";
+            let i = 0;
+            const container = document.getElementById("typewriter");
+            container.innerHTML = ""; 
+            function escribir() {
+                if (i < texto.length) {
+                    container.innerHTML += texto.charAt(i);
+                    i++;
+                    setTimeout(escribir, 45); 
+                }
+            }
+            escribir();
+        }
+    </script>
+</body>
+</html>
